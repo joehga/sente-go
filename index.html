@@ -17,24 +17,27 @@
 <body>
 <main>
   <h1>SENTE</h1>
-  <a class="go" id="go" href="#">ショートカットを実行</a>
+  <a class="go" id="go" href="#">開く</a>
   <p id="msg">自動で始まらないときは、上のボタンを押してください。</p>
 </main>
 <script>
-  // 呼べるショートカットは、ここに書いた名前だけ。ほかの名前は受け付けない。
-  var MAP = { gmail: 'Gmail開く', update: 'SENTE更新' };
+  // 呼べる先は、ここに書いたものだけ。ほかは受け付けない。
+  // gmail はショートカットを通さず、Gmailアプリを直接開く。
+  var MAP = {
+    gmail:  { url: 'googlegmail://', label: 'Gmailアプリを開く' },
+    update: { url: 'shortcuts://run-shortcut?name=' + encodeURIComponent('SENTE更新'), label: '「SENTE更新」を実行' }
+  };
   var key = new URLSearchParams(location.search).get('s') || '';
-  var name = MAP[key];
+  var dest = MAP[key];
   var go = document.getElementById('go'), msg = document.getElementById('msg');
-  if (!name) {
+  if (!dest) {
     go.removeAttribute('href'); go.style.opacity = .4;
     go.textContent = '呼び先が指定されていません';
     msg.textContent = 'アドレスの最後に ?s=gmail か ?s=update を付けて開いてください。';
   } else {
-    var url = 'shortcuts://run-shortcut?name=' + encodeURIComponent(name);
-    go.href = url;
-    go.textContent = '「' + name + '」を実行';
-    setTimeout(function(){ location.href = url; }, 300);
+    go.href = dest.url;
+    go.textContent = dest.label;
+    setTimeout(function(){ location.href = dest.url; }, 300);
   }
 </script>
 </body>
