@@ -27,13 +27,19 @@
     gmail:  { url: 'googlegmail://', label: 'Gmailアプリを開く' },
     update: { url: 'shortcuts://run-shortcut?name=' + encodeURIComponent('SENTE更新'), label: '「SENTE更新」を実行' }
   };
-  var key = new URLSearchParams(location.search).get('s') || '';
+  var qs = new URLSearchParams(location.search);
+  var key = qs.get('s') || '';
   var dest = MAP[key];
+  // yt は動画の番号（英数字と - _ の11文字）だけ受け付け、YouTubeアプリで開く。
+  var vid = qs.get('v') || '';
+  if (key === 'yt' && /^[A-Za-z0-9_-]{11}$/.test(vid)) {
+    dest = { url: 'youtube://watch?v=' + vid, label: 'YouTubeアプリで開く' };
+  }
   var go = document.getElementById('go'), msg = document.getElementById('msg');
   if (!dest) {
     go.removeAttribute('href'); go.style.opacity = .4;
     go.textContent = '呼び先が指定されていません';
-    msg.textContent = 'アドレスの最後に ?s=gmail か ?s=update を付けて開いてください。';
+    msg.textContent = 'アドレスの指定が正しくありません。SENTEのリンクから開き直してください。';
   } else {
     go.href = dest.url;
     go.textContent = dest.label;
